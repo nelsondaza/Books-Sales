@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesResources;
+use Illuminate\Validation\ValidationException;
 
 class Controller extends BaseController
 {
@@ -74,6 +75,36 @@ class Controller extends BaseController
 	 */
 	public function buildFailedValidationResponse( Request $request, array $errors ) {
 		return $this->responseFail( 'Validation Error.', 422, 422, $errors );
+	}
+
+	/**
+	 * Response with a JSON version of the Exception
+	 * @param \Exception $exception
+	 * @param int $HTTPCode
+	 * @param null $data
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function responseException( \Exception $exception, $HTTPCode = 404, $data = null ) {
+
+		if( $exception instanceof ValidationException ) {
+			$this->responseObject['error'] = $exception->getResponse()->getData(true)['error'];
+			$data = $exception->getResponse()->getData(true)['data'];
+		}
+		else {
+			$this->responseObject['error'] = [
+				'message' => $exception->getMessage(),
+				'code' => $exception->getCode() || $HTTPCode,
+			];
+		}
+
+		/**
+		 * Just for debug to give more details
+		 */
+		if( env('APP_DEBUG')) {
+			$this->responseObject['error']['trace'] = array_slice( $exception->getTrace(), 0, 5 );
+		}
+
+		return $this->response( $data, $HTTPCode );
 	}
 
 
