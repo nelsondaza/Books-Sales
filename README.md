@@ -1,7 +1,19 @@
 # Books-Sales
 Book &amp; Sales - Test
 
+---
+## Autor
 
+####Nelson Daza
+
+**LinkedIn:** https://www.linkedin.com/in/nelsonadp
+
+**E-mail:** [nelson.daza@gmail.com](mailto:nelson.daza@gmail.com)
+
+**Skype:** nelson.daza
+
+
+---
 ##Laravel - Prueba Técnica
 
 Crear un API REST que permite hacer operaciones CRUD sobre un sistema de
