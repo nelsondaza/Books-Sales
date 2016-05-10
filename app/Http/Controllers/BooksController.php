@@ -37,7 +37,13 @@ class BooksController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		//
+		$this->validateRequest($request);
+		$book = Books::create( $request->all() );
+		
+		/**
+		 * Response with the new object
+		 */
+		return $this->response( $book );
 	}
 
 	/**
@@ -92,4 +98,26 @@ class BooksController extends Controller
 	{
 		//
 	}
+
+	/**
+	 * Validate form data
+	 * @param Request $request
+	 */
+	private function validateRequest( Request $request ) {
+		$this->validate($request, [
+			'author' => 'required|min:2',
+			'title' => 'required|min:2',
+			'reference' => 'required',
+			'units_available' => 'required|numeric|min:0',
+			'price' => 'required|numeric|min:1',
+			'published_at' => 'required|date',
+		],[
+			'required' => 'The :attribute field is required.',
+			'min' => 'The :attribute field needs at least :min chars.',
+			'numeric' => 'The :attribute field needs to be numeric.',
+			'date' => 'The :attribute field needs to a valid date.',
+			'price.min' => 'The :attribute needs to be equals or bigger than 1.',
+		]);
+	}
+
 }

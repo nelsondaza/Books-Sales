@@ -73,4 +73,40 @@ class BooksTest extends TestCase
 		]);
 	}
 
+	/**
+	 * Test create/delete a book
+	 *
+	 * @return void
+	 */
+	public function testCreateBook()
+	{
+		$book = factory(\App\Models\Books::class, 1)->make();
+
+		$this->post('/api/books/', $book->getAttributes())->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+		]);
+
+		/**
+		 * Test general validations error
+		 */
+		$book = new \App\Models\Books();
+		$this->post('/api/books/', $book->getAttributes())->seeJsonStructure([
+			'error' => [
+				'code',
+				'message',
+				'trace'
+			],
+			'data' => []
+		])->seeJson([
+			'message' => "Validation Error.",
+			'code' => 422
+		]);
+	}
+
+
 }
