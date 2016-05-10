@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sales;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -15,7 +16,7 @@ class SalesController extends Controller
      */
     public function index()
     {
-        //
+        return $this->response( Sales::all() );
     }
 
     /**
@@ -47,7 +48,11 @@ class SalesController extends Controller
      */
     public function show($id)
     {
-        //
+        $sale = Sales::find( $id );
+        if( $sale )
+            return $this->response( $sale );
+        return $this->responseFail( 'Sale not found.', 404 );
+
     }
 
     /**
