@@ -12,5 +12,10 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+	return view('welcome');
+});
+
+Route::group(['prefix' => 'api'], function () {
+	Route::resource('books', 'BooksController');
+	Route::resource('sales', 'SalesController');
 });
