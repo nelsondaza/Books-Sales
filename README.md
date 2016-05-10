@@ -45,6 +45,72 @@ Al final enviar al correo lina.gomez@talosdigital.com elcodigo en git.
 
 ---
 
+## Instalación
 
+Para obtener una copia completa de la prueba use el comando: (La instalación de _git_ no es parte de este manual)
+```
+git clone https://github.com/nelsondaza/Books-Sales.git
+```
+
+Ubíquese dentro de la carpeta creada:
+```
+cd Books-Sales/
+```
+
+Ejecute composer para instalar las dependencias: (La instalación de _composer_ no es parte de este manual)
+```
+composer install
+```
+
+Cree un archivo de entorno basándose en el de ejemplo:
+```
+cp .env.example .env
+```
+
+Cree una llave de aplicación:
+```
+php artisan key:generate
+```
+
+Edite el archivo _.env_ configurando la conexión a una base de datos ya creada:
+> DB_CONNECTION=mysql
+> DB_HOST=127.0.0.1
+> DB_PORT=3306
+> DB_DATABASE=homestead
+> DB_USERNAME=homestead
+> DB_PASSWORD=secret
+
+Cree las entidades:
+```
+php artisan migrate
+```
+
+Cree los datos iniciales:
+```
+php artisan db:seed
+```
+
+Ejecute las pruebas unitarias:
+```
+vendor/bin/phpunit
+```
+
+Para verlo en su navegador podría usar el siguiente comando:
+```
+php artisan serve --host=localhost --port=9092
+```
+URL de prueba:
+
+Contenido | URL
+------------ | -------------
+Listado de libros | http://localhost:9092/api/books
+Ver el libro con ID 10 y sus ventas | http://localhost:9092/api/books/10
+Listado de ventas | http://localhost:9092/api/sales
+Ver la venta con ID 32 | http://localhost:9092/api/sales/32
+
+> Para ver el listado de rutas y sus métodos:
+>
+> ```php artisan route:list```
+>
 
 
