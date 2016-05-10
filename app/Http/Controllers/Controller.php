@@ -13,7 +13,7 @@ class Controller extends BaseController
 	use AuthorizesRequests, AuthorizesResources, DispatchesJobs, ValidatesRequests;
 
 	/**
-	 * GEneral Response Object
+	 * General Response Object
 	 * @var array
 	 */
 	private $responseObject = [
@@ -21,7 +21,12 @@ class Controller extends BaseController
 		'error' => null
 	];
 
-
+	/**
+	 * General JSON response
+	 * @param $data
+	 * @param int $HTTPCode
+	 * @return \Illuminate\Http\JsonResponse
+	 */
 	public function response($data, $HTTPCode = 200)
 	{
 		/**
@@ -38,5 +43,27 @@ class Controller extends BaseController
 		 */
 		return response()->json($this->responseObject, $HTTPCode);
 	}
+
+	/**
+	 * Error JSON response
+	 * @param $message
+	 * @param $code
+	 * @param int $HTTPCode
+	 * @param null $data
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function responseFail( $message, $code, $HTTPCode = 404, $data = null ) {
+
+		/**
+		 * Error need: user message, error code, trace for debug
+		 */
+		$this->responseObject['error'] = [
+			'message' => $message,
+			'code' => $code,
+			'trace' => null
+		];
+		return $this->response( $data, $HTTPCode );
+	}
+
 
 }

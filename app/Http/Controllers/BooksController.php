@@ -48,7 +48,15 @@ class BooksController extends Controller
 	 */
 	public function show($id)
 	{
-		//
+		$book = Books::find( $id );
+		if( $book ) {
+			/**
+			 * List sales too
+			 */
+			$book->sales;
+			return $this->response($book);
+		}
+		return $this->responseFail( 'Book not found.', 404 );
 	}
 
 	/**
