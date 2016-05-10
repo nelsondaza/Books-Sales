@@ -73,17 +73,14 @@ php artisan key:generate
 ```
 
 Edite el archivo _.env_ configurando la conexión a una base de datos ya creada:
+```
 > DB_CONNECTION=mysql
->
 > DB_HOST=127.0.0.1
->
 > DB_PORT=3306
->
 > DB_DATABASE=homestead
->
 > DB_USERNAME=homestead
->
 > DB_PASSWORD=secret
+```
 
 Cree las entidades en la BDD:
 ```
