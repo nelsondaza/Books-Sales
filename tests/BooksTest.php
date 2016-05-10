@@ -7,12 +7,17 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class BooksTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Test books list.
      *
      * @return void
      */
-    public function testExample()
+    public function testListBooks()
     {
-        $this->assertTrue(true);
+        $this->get('/api/books')->seeJsonStructure([
+            'error',
+            'data' => []
+        ])->seeJson([
+            'error' => null,
+        ]);
     }
 }
