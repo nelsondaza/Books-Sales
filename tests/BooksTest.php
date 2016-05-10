@@ -82,14 +82,29 @@ class BooksTest extends TestCase
 	{
 		$book = factory(\App\Models\Books::class, 1)->make();
 
-		$this->post('/api/books/', $book->getAttributes())->seeJsonStructure([
+		$result = $this->post('/api/books/', $book->getAttributes())->seeJsonStructure([
 			'error',
 			'data' => [
 				$this->structure
 			]
 		])->seeJson([
 			'error' => null,
+		])->decodeResponseJson();
+		$resultData = $result['data'][0];
+
+		/**
+		 * Remove the newly created book just to keep it clean
+		 */
+		$this->delete('/api/books/' . $resultData['id'])->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'id' => $resultData['id']
 		]);
+
 
 		/**
 		 * Test general validations error
@@ -107,6 +122,5 @@ class BooksTest extends TestCase
 			'code' => 422
 		]);
 	}
-
 
 }

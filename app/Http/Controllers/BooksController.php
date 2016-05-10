@@ -39,7 +39,7 @@ class BooksController extends Controller
 	{
 		$this->validateRequest($request);
 		$book = Books::create( $request->all() );
-		
+
 		/**
 		 * Response with the new object
 		 */
@@ -96,7 +96,15 @@ class BooksController extends Controller
 	 */
 	public function destroy($id)
 	{
-		//
+		$book = Books::find( $id );
+
+		if( $book ) {
+			if( $book->delete() )
+				return $this->response($book);
+			return $this->responseFail("Action not allowed.", 403);
+		}
+
+		return $this->responseFail("Book not found.", 404);
 	}
 
 	/**
