@@ -89,7 +89,44 @@ class SalesController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		//
+		$sale = Sales::find( $id );
+
+		if( $sale ) {
+			$this->validateUpdateRequest($request);
+
+			$oldBook = $sale->book;
+			$newBook = $oldBook;
+
+			/**
+			 * can we change the sold book?
+			 */
+			if( $sale->book_id != $request->get('book_id') ) {
+				$newbook = Books::find( $request->get('book_id') );
+				if( $newbook->units_available <= 0 )
+					return $this->responseFail('Validation Error.', 422, 422, ['book_id' => 'No units available of the new book.']);
+			}
+
+			$sale->book_id = $request->get('book_id');
+			$sale->price = $request->get('price');
+
+			$sale->save();
+
+			/**
+			 * let's update the available books
+			 */
+			if( $oldBook->id != $newBook->id ) {
+				$oldBook->units_available ++;
+				$oldBook->save();
+
+				$newBook->units_available --;
+				$newBook->save();
+			}
+
+			return $this->response($sale);
+
+		}
+
+		return $this->responseFail("Sale not found.", 404);
 	}
 
 	/**
@@ -138,4 +175,19 @@ class SalesController extends Controller
 		]);
 	}
 
+	/**
+	 * Validate form data for update action
+	 * @param Request $request
+	 */
+	private function validateUpdateRequest( Request $request ) {
+		$this->validate($request, [
+			'book_id' => 'exists:books,id',
+			'price' => 'numeric|min:1',
+		],[
+			'books_id.exists' => 'Not an existing book for this sale.',
+			'min' => 'The :attribute field needs at least :min chars.',
+			'numeric' => 'The :attribute field needs to be numeric.',
+			'price.min' => 'The :attribute needs to be equals or bigger than 1.',
+		]);
+	}
 }

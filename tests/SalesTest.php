@@ -115,4 +115,114 @@ class SalesTest extends TestCase
 		]);
 	}
 
+	/**
+	 * Test edit/update a sale
+	 *
+	 * @return void
+	 */
+	public function testEditSale()
+	{
+		$sale = factory(\App\Models\Sales::class, 1)->make();
+
+		/**
+		 * The book to sale
+		 */
+		$book = $this->get('/api/books/' . $sale->book_id )->seeJsonStructure([
+			'error',
+			'data' => []
+		])->seeJson([
+			'error' => null,
+			'id' => $sale->book_id
+		])->decodeResponseJson();
+
+		/**
+		 * Sold!
+		 */
+		$result = $this->post('/api/sales/', $sale->getAttributes())->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+		])->decodeResponseJson();
+		$resultData = $result['data'][0];
+
+		/**
+		 * The book has less available units, right?
+		 */
+		$bookUsed = $this->get('/api/books/' . $sale->book_id )->seeJsonStructure([
+			'error',
+			'data' => []
+		])->seeJson([
+			'error' => null,
+			'id' => $sale->book_id
+		])->decodeResponseJson();
+
+		/**
+		 * Units available changed
+		 */
+		$this->assertEquals( $book['data'][0]['units_available'] - 1, $bookUsed['data'][0]['units_available'] );
+
+
+		/**
+		 * Update the newly created sale
+		 */
+		$sale->price = 9999999;
+		$this->put('/api/sales/' . $resultData['id'], $sale->getAttributes())->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'price' => $sale->price
+		]);
+
+		/**
+		 * Update the newly created sale with a wrong book
+		 *
+		 */
+		$this->put('/api/sales/' . $resultData['id'], ['book_id' => 999999])->seeJsonStructure([
+			'error' => [
+				'code',
+				'message',
+				'trace'
+			],
+			'data' => []
+		])->seeJson([
+			'message' => "Validation Error.",
+			'code' => 422
+		]);
+
+		/**
+		 * Remove the newly created sale just to keep it clean
+		 */
+		$resultData = $result['data'][0];
+		$this->delete('/api/sales/' . $resultData['id'])->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'id' => $resultData['id']
+		]);
+
+		/**
+		 * The book has the original available units, right?
+		 */
+		$bookUsed = $this->get('/api/books/' . $sale->book_id )->seeJsonStructure([
+			'error',
+			'data' => []
+		])->seeJson([
+			'error' => null,
+			'id' => $sale->book_id
+		])->decodeResponseJson();
+
+		/**
+		 * Units available changed back
+		 */
+		$this->assertEquals( $book['data'][0]['units_available'], $bookUsed['data'][0]['units_available'] );
+	}
 }
