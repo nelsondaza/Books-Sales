@@ -123,4 +123,82 @@ class BooksTest extends TestCase
 		]);
 	}
 
+	/**
+	 * Test edit/update a book
+	 *
+	 * @return void
+	 */
+	public function testEditBook()
+	{
+		$book = factory(\App\Models\Books::class, 1)->make();
+
+		$result = $this->post('/api/books/', $book->getAttributes())->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+		])->decodeResponseJson();
+		$resultData = $result['data'][0];
+
+
+		/**
+		 * Update the newly created book
+		 */
+		$book->title = 'New Title ' . $resultData['id'];
+		$this->put('/api/books/' . $resultData['id'], $book->getAttributes())->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'title' => $book->title
+		]);
+
+		/**
+		 * Update just available units
+		 */
+		$this->put('/api/books/' . $resultData['id'], ['units_available' => $book->units_available + 100])->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'units_available' => $book->units_available + 100
+		]);
+
+		/**
+		 * Update price to 0, expected error
+		 */
+		$this->put('/api/books/' . $resultData['id'], ['price' => 0])->seeJsonStructure([
+			'error' => [
+				'code',
+				'message',
+				'trace'
+			],
+			'data' => []
+		])->seeJson([
+			'message' => "Validation Error.",
+			'code' => 422
+		]);
+
+		/**
+		 * Remove the newly created book just to keep it clean
+		 */
+		$resultData = $result['data'][0];
+		$this->delete('/api/books/' . $resultData['id'])->seeJsonStructure([
+			'error',
+			'data' => [
+				$this->structure
+			]
+		])->seeJson([
+			'error' => null,
+			'id' => $resultData['id']
+		]);
+
+	}
+
 }

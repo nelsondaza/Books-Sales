@@ -85,7 +85,27 @@ class BooksController extends Controller
 	 */
 	public function update(Request $request, $id)
 	{
-		//
+		$book = Books::find( $id );
+
+		if( $book ) {
+			$this->validateUpdateRequest($request);
+
+			/**
+			 * Not required for update
+			 */
+			$book->author = $request->get('author', $book->author);
+			$book->title = $request->get('title', $book->title);
+			$book->reference = $request->get('reference', $book->reference);
+			$book->units_available = $request->get('units_available', $book->units_available);
+			$book->price = $request->get('price', $book->price);
+			$book->published_at = $request->get('published_at', $book->published_at);
+
+			$book->save();
+			return $this->response($book);
+
+		}
+
+		return $this->responseFail("Book not found.", 404);
 	}
 
 	/**
@@ -128,4 +148,22 @@ class BooksController extends Controller
 		]);
 	}
 
+	/**
+	 * Validate form data for update
+	 * @param Request $request
+	 */
+	private function validateUpdateRequest( Request $request ) {
+		$this->validate($request, [
+			'author' => 'min:2',
+			'title' => 'min:2',
+			'units_available' => 'numeric|min:0',
+			'price' => 'numeric|min:1',
+			'published_at' => 'date',
+		],[
+			'min' => 'The :attribute field needs at least :min chars.',
+			'numeric' => 'The :attribute field needs to be numeric.',
+			'date' => 'The :attribute field needs to a valid date.',
+			'price.min' => 'The :attribute needs to be equals or bigger than 1.',
+		]);
+	}
 }
